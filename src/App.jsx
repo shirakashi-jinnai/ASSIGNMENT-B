@@ -13,35 +13,46 @@ import TableBody from '@material-ui/core/TableBody';
 
 const App = () => {
     const [imgURL, setImgURL] = useState(''),
-        [scores, setScores] = useState('')
+        [scores, setScores] = useState(''),
+        [status, setStatus] = useState(false);
 
 
     const inputImgURL = useCallback((e) => {
         setImgURL(e.target.value)
     }, [setImgURL]);
 
-
     const analyze = (url) => {
-        if (!url) { return false }
+        setStatus(true)
         const request = new XMLHttpRequest();
 
         request.open('GET', `https://lf-exam-v2.web.app/api/analyze?imageUrl=${url}`, true)
+
         request.responseType = 'json'
 
         request.onload = function () {
+            setStatus(request.status)
+            if (request.status !== 200) {
+                console.log(request.status)
+                setStatus(false)
+                return false
+            }
             const data = this.response;
             setScores(data)
+            setStatus(false)
         };
-
         request.send()
     }
 
 
     return (
         <div className='section-wrapin'>
-            <h1>test</h1>
+            <h2>Example App</h2>
             <TextField onChange={inputImgURL} value={imgURL} label='image URL' required variant='outlined' size='small' />
-            <Button color='primary' variant="contained" onClick={() => { analyze(imgURL) }} ><FindInPageIcon /> ANALYZE</Button>
+            {status ? (
+                <Button variant="contained"  ><FindInPageIcon /> ANALYZING...</Button>
+            ) : (
+                <Button color='primary' variant="contained" onClick={() => { analyze(imgURL) }} ><FindInPageIcon /> ANALYZE</Button>
+            )}
             <div className="result-area">
                 {scores.length ? (
                     <TableContainer>
