@@ -21,9 +21,9 @@ const App = () => {
         setImgURL(e.target.value)
     }, [setImgURL]);
 
-    const analyze = useCallback((url) => {
+    const analyze = useCallback(() => {
         setStatus(true)
-        const URL = `https://lf-exam-v2.web.app/api/analyze?imageUrl=${url}`
+        const URL = `https://lf-exam-v2.web.app/api/analyze?imageUrl=${imgURL}`
 
         fetch(URL)
             .then(response => {
@@ -46,7 +46,7 @@ const App = () => {
             {status ? (
                 <Button variant="contained"  ><FindInPageIcon /> ANALYZING...</Button>
             ) : (
-                <Button color='primary' variant="contained" onClick={()=>analyze(imgURL)} ><FindInPageIcon /> ANALYZE</Button>
+                <Button color='primary' variant="contained" onClick={analyze} ><FindInPageIcon /> ANALYZE</Button>
             )}
             <div className="result-area">
                 {scores.length ? (
