@@ -23,24 +23,19 @@ const App = () => {
 
     const analyze = (url) => {
         setStatus(true)
-        const request = new XMLHttpRequest();
+        const URL = `https://lf-exam-v2.web.app/api/analyze?imageUrl=${url}`
 
-        request.open('GET', `https://lf-exam-v2.web.app/api/analyze?imageUrl=${url}`, true)
-
-        request.responseType = 'json'
-
-        request.onload = function () {
-            setStatus(request.status)
-            if (request.status !== 200) {
-                console.log(request.status)
+        fetch(URL)
+            .then(response => {
+                console.log(response.status)
+                response.json().then((data) => {
+                    setScores(data)
+                })
                 setStatus(false)
-                return false
-            }
-            const data = this.response;
-            setScores(data)
-            setStatus(false)
-        };
-        request.send()
+            }).catch(error => {
+                console.log(error)
+                setStatus(false)
+            })
     }
 
 
