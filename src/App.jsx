@@ -10,6 +10,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
+import _ from 'lodash';
+import { db } from './firebase/firebase';
+import { useEffect } from 'react';
 
 const App = () => {
   const [imgURL, setImgURL] = useState(''),
@@ -29,8 +32,15 @@ const App = () => {
       const URL = `https://lf-exam-v2.web.app/api/analyze?imageUrl=${url}`;
       fetch(URL)
         .then((response) => {
+          console.log(response.status);
           response.json().then((data) => {
             setScores(data);
+            db.collection('analyze')
+              .doc('data')
+              .set({ response: data })
+              .then(() => {
+                console.log('success');
+              });
           });
           setStatus(false);
         })
@@ -41,6 +51,16 @@ const App = () => {
     },
     [imgURL]
   );
+
+  useEffect(() => {
+    db.collection('analyze')
+      .doc('data')
+      .get()
+      .then((snapshot) => {
+        const data = snapshot.data();
+        setScores(data.response);
+      });
+  }, []);
 
   return (
     <div className='section-wrapin'>
@@ -68,7 +88,7 @@ const App = () => {
         </Button>
       )}
       <div className='result-area'>
-        {scores.length ? (
+        {scores ? (
           <TableContainer>
             <Table>
               <TableHead>
